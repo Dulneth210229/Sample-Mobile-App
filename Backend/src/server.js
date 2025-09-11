@@ -4,6 +4,7 @@ import "dotenv/config";
 const app = express();
 const PORT = process.env.PORT || 5005;
 const mongoURI = process.env.MONGO_URI;
+app.use(express.json()); //passing incoming data in json format
 
 mongoose
   .connect(mongoURI)

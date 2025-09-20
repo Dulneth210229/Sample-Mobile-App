@@ -2,6 +2,9 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import User from "../model/User";
 
+const generateToken = (userId) => {
+  jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: "15d" });
+};
 const userController = {
   register: async (req, res) => {
     try {
@@ -39,7 +42,20 @@ const userController = {
       const profileImage = `https://api.dicebear.com/7.x/avataaars/svg?seed=${username}`;
       const user = new User({ email, username, password, profileImage });
       await user.save(); //save the created user
+
+      const token = generateToken(user._id);
+
+      res.status(201).json({
+        token,
+        user: {
+          _id: user._id,
+          username: user.username,
+          email: user.email,
+          profileImage: user.profileImage,
+        },
+      });
     } catch (error) {
+      console.info("Error register user", error);
       res.status(500).json({ message: error.message });
     }
   },

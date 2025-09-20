@@ -34,7 +34,8 @@ const useSchema = new mongoose.Schema({
 
 //Hash the password before saving user to db
 useSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
+  //"save" --> Before we save the user or create the user run this function
+  if (!this.isModified("password")) return next(); //isModified check whether the password has been already changed or modified
   const salt = await bcrypt.genSalt(15);
   this.password = await bcrypt.hash(this.password, salt);
 

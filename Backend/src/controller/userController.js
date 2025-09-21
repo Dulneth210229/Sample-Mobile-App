@@ -59,6 +59,47 @@ const userController = {
       res.status(500).json({ message: "Internal server error" });
     }
   },
+
+  login: async (req, res) => {
+    try {
+      const { email, password } = req.body;
+
+      if (!email || !password)
+        return res.status(400).json({ message: "All fields must be required" });
+
+      //check the user exist
+      const user = await User.findOne({ email });
+
+      if (!user)
+        return res
+          .status(400)
+          .json({ message: `No user exist with the mail ${email}` });
+
+      //!Check if the password is correct
+      const isPasswordCorrect = await user.comparePassword(password);
+      if (!isPasswordCorrect)
+        return res
+          .status(400)
+          .json({ message: "The password you entered is incorrect" });
+
+      //generate the token
+      const token = generateToken(user._id);
+
+      res.status(200).json({
+        token,
+        user: {
+          id: user._id,
+          username: user.username,
+          email: user.email,
+          profileImage: user.profileImage,
+          createdAt: user.createdAt,
+        },
+      });
+    } catch (error) {
+      console.warn("Error in login controller");
+      res.status(500).json({ message: "Internal server error" });
+    }
+  },
 };
 
 export default userController;

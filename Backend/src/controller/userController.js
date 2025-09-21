@@ -1,9 +1,9 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
-import User from "../model/User";
+import User from "../model/User.js";
 
 const generateToken = (userId) => {
-  jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: "15d" });
+  return jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: "15d" });
 };
 const userController = {
   register: async (req, res) => {
@@ -32,7 +32,7 @@ const userController = {
       }
 
       const existingUsername = await User.findOne({ username });
-      if (username) {
+      if (existingUsername) {
         return res
           .status(400)
           .json({ message: `${username} username already exist` });
@@ -56,7 +56,9 @@ const userController = {
       });
     } catch (error) {
       console.info("Error register user", error);
-      res.status(500).json({ message: error.message });
+      res.status(500).json({ message: "Internal server error" });
     }
   },
 };
+
+export default userController;
